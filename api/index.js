@@ -198,7 +198,47 @@ app.get("/user/notes", checkAccessToken, (req, res) => {
 });
 
 // notes routes
-app.post("/notes/create", (req, res) => {});
+app.post(
+    "/notes/create",
+    (req, res, next) => {
+        const note = req.body;
+        const user = res.locals.user;
+
+        if (note.userId == null || note.userId !== user.id) {
+            return res.status(403).send(responses.noPermission);
+        }
+    },
+    (req, res, next) => {
+        const note = req.body;
+        const user = res.locals.user;
+
+        const addNoteQuery = "INSERT INTO notes VALUES (NULL, ?, ?, ?, ?)";
+        db.query(addNoteQuery, [user.id, note.title, note.content, new Date(), new Date()], (err, results) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send(responses.serverError);
+            } else {
+                next();
+            }
+        });
+    },
+    (req, res) => {
+        const note = req.body;
+        const user = res.locals.user;
+
+        const addNoteQuery = "SELECT FROM notes WHERE user_id = ? AND title = ? AND content = ? AND dateOfCreation = ? AND dateOfModification = ?";
+        db.query(addNoteQuery, [user.id, note.title, note.content, new Date(), new Date()], (err, results) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send(responses.serverError);
+            } else if (results.length == 0) {
+                res.status(500).send(responses.serverError);
+            } else {
+                res.status(200).json(results[0]);
+            }
+        });
+    }
+);
 
 app.post("/notes/modify", (req, res) => {});
 
