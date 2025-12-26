@@ -28,6 +28,7 @@ const db = mysql.createConnection({
     database: "notesKeep",
 });
 
+// FUNCTIONS
 async function hashPassword(password) {
     try {
         const hash = await argon.hash(password);
@@ -83,6 +84,7 @@ function checkAccessToken(req, res, next) {
     });
 }
 
+// ROUTES
 // authentication routes
 app.post("/login", (req, res) => {
     const user = req.body;
@@ -161,7 +163,7 @@ app.post(
 );
 
 // user routes
-app.get("/users/me", checkAccessToken, (req, res) => {
+app.get("/user/me", checkAccessToken, (req, res) => {
     const user = res.locals.user;
 
     const getUserQuery = "SELECT * FROM users WHERE id = ?";
@@ -177,6 +179,30 @@ app.get("/users/me", checkAccessToken, (req, res) => {
         }
     });
 });
+
+app.get("/user/notes", checkAccessToken, (req, res) => {
+    const user = res.locals.user;
+
+    const getNotesQuery = "SELECT * FROM notes WHERE user_id = ?";
+    db.query(getNotesQuery, [user.id], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send(responses.serverError);
+        } else if (results.length == 0) {
+            res.status(404).send(responses.notFound);
+        } else {
+            const notesArr = results;
+            res.status(200).json(notesArr);
+        }
+    });
+});
+
+// notes routes
+app.post("/notes/create", (req, res) => {});
+
+app.post("/notes/modify", (req, res) => {});
+
+app.post("/notes/delete", (req, res) => {});
 
 // listen
 app.listen(port, async () => {
