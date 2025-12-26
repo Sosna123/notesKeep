@@ -16,6 +16,7 @@ const responses = {
     notFound: "Not found",
     serverError: "Internal server error",
     wrongCredentials: "Wrong credentials",
+    notEnoughInfo: "Not enough information provided",
 };
 
 app.use(morgan("dev"));
@@ -200,20 +201,25 @@ app.get("/user/notes", checkAccessToken, (req, res) => {
 // notes routes
 app.post(
     "/notes/create",
+    checkAccessToken,
     (req, res, next) => {
         const note = req.body;
         const user = res.locals.user;
 
-        if (note.userId == null || note.userId !== user.id) {
+        if (note.user_id == null || note.user_id !== user.id) {
             return res.status(403).send(responses.noPermission);
+        } else {
+            next();
         }
     },
     (req, res, next) => {
         const note = req.body;
         const user = res.locals.user;
+        let currDate = Number(new Date()).toString();
+        res.locals.currDate = currDate;
 
-        const addNoteQuery = "INSERT INTO notes VALUES (NULL, ?, ?, ?, ?)";
-        db.query(addNoteQuery, [user.id, note.title, note.content, new Date(), new Date()], (err, results) => {
+        const addNoteQuery = "INSERT INTO notes VALUES (NULL, ?, ?, ?, ?, ?)";
+        db.query(addNoteQuery, [user.id, note.title, note.content, currDate, currDate], (err, results) => {
             if (err) {
                 console.error(err);
                 return res.status(500).send(responses.serverError);
@@ -226,8 +232,8 @@ app.post(
         const note = req.body;
         const user = res.locals.user;
 
-        const addNoteQuery = "SELECT FROM notes WHERE user_id = ? AND title = ? AND content = ? AND dateOfCreation = ? AND dateOfModification = ?";
-        db.query(addNoteQuery, [user.id, note.title, note.content, new Date(), new Date()], (err, results) => {
+        const addNoteQuery = "SELECT * FROM notes WHERE user_id = ? AND title = ? AND content = ? AND dateOfCreation = ? AND dateOfLastChange = ?";
+        db.query(addNoteQuery, [user.id, note.title, note.content, res.locals.currDate, res.locals.currDate], (err, results) => {
             if (err) {
                 console.error(err);
                 return res.status(500).send(responses.serverError);
@@ -240,9 +246,85 @@ app.post(
     }
 );
 
-app.post("/notes/modify", (req, res) => {});
+app.put(
+    "/notes/modify",
+    checkAccessToken,
+    (req, res, next) => {
+        const note = req.body;
+        const user = res.locals.user;
 
-app.post("/notes/delete", (req, res) => {});
+        if (note.id == null) {
+            return res.status(403).send(responses.notEnoughInfo);
+        } else if (note.user_id == null || note.user_id !== user.id) {
+            return res.status(403).send(responses.noPermission);
+        } else {
+            next();
+        }
+    },
+    (req, res, next) => {
+        const note = req.body;
+        let currDate = Number(new Date()).toString();
+        res.locals.currDate = currDate;
+
+        const modifyNoteQuery = "UPDATE notes SET title = ?, content = ?, dateOfLastChange = ? WHERE id = ? AND user_id = ?";
+        db.query(modifyNoteQuery, [note.title, note.content, currDate, note.id, note.user_id], (err, results) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send(responses.serverError);
+            } else if (results.affectedRows == 0) {
+                res.status(404).send(responses.notFound);
+            } else {
+                next();
+            }
+        });
+    },
+    (req, res) => {
+        const note = req.body;
+        const user = res.locals.user;
+
+        const addNoteQuery = "SELECT * FROM notes WHERE id = ? AND user_id = ?";
+        db.query(addNoteQuery, [note.id, user.id], (err, results) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send(responses.serverError);
+            } else if (results.length == 0) {
+                res.status(500).send(responses.serverError);
+            } else {
+                res.status(200).json(results[0]);
+            }
+        });
+    }
+);
+
+app.delete(
+    "/notes/delete",
+    checkAccessToken,
+    (req, res, next) => {
+        const note = req.body;
+        const user = res.locals.user;
+
+        if (note.user_id == null || note.user_id !== user.id) {
+            return res.status(403).send(responses.noPermission);
+        } else {
+            next();
+        }
+    },
+    (req, res) => {
+        const note = req.body;
+
+        const deleteNoteQuery = "DELETE FROM notes WHERE id = ? AND user_id = ?";
+        db.query(deleteNoteQuery, [note.id, note.user_id], (err, results) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send(responses.serverError);
+            } else if (results.affectedRows == 0) {
+                res.status(404).send(responses.notFound);
+            } else {
+                res.status(200).send("Note deleted successfully");
+            }
+        });
+    }
+);
 
 // listen
 app.listen(port, async () => {
