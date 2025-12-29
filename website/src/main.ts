@@ -6,12 +6,10 @@ import { createWebHistory, createRouter } from "vue-router";
 
 import Home from "./views/Home.vue";
 import Login from "./views/Login.vue";
-import Note from "./views/Note.vue";
 
 const routes = [
     { path: "/", component: Home },
     { path: "/login", component: Login },
-    { path: "/note/:id", component: Note },
 ];
 
 export const router = createRouter({

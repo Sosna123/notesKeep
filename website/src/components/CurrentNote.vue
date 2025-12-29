@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { apiUri, type Note } from "../exports";
+import { ref } from "vue";
 const props = defineProps<{
-    note: Note | null;
+    note: Note;
 }>();
 const emit = defineEmits<{
     (e: "close"): void;
@@ -15,6 +16,9 @@ function formatDate(timestamp: number | null): string {
 }
 
 async function updateNote() {
+    currModified.value = Number(new Date());
+    props.note.dateOfLastChange = currModified.value;
+
     const data = await fetch(`${apiUri}/notes/modify`, {
         method: "PUT",
         headers: {
@@ -28,6 +32,12 @@ async function updateNote() {
         console.error("Failed to update note");
     }
 }
+
+let currModified = ref<number>(props.note?.dateOfLastChange ?? 0);
+function close() {
+    currModified.value = 0;
+    emit("close");
+}
 </script>
 
 <template>
@@ -40,17 +50,17 @@ async function updateNote() {
                     </div>
                     <div>
                         Created: {{ formatDate(props.note.dateOfCreation) }} <br />
-                        Modified: {{ formatDate(props.note.dateOfLastChange) }}
+                        Modified: {{ formatDate(currModified) }}
                     </div>
                 </div>
                 <v-divider></v-divider>
             </template>
             <template v-slot:text>
-                <v-textarea v-model="props.note.content" auto-grow @change="updateNote()"></v-textarea>
+                <v-textarea v-model="props.note.content" max-rows="25" auto-grow @change="updateNote()"></v-textarea>
             </template>
             <template v-slot:actions>
                 <div>
-                    <v-btn @click="emit('close')">close</v-btn>
+                    <v-btn @click="close()">close</v-btn>
                 </div>
             </template>
         </v-card>
