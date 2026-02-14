@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import LoginForm from "../components/LoginForm.vue";
-import SignUpForm from "../components/SignUpForm.vue";
+import LoginForm from "../components/Login/LoginForm.vue";
+import SignUpForm from "../components/Login/SignUpForm.vue";
 
 import { ref } from "vue";
 import { useRouter } from "vue-router";

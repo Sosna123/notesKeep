@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { apiUri, type Note } from "../exports";
 import CurrentNote from "../components/CurrentNote.vue";
+
+const props = defineProps({ updateNotes: Number });
 
 const notes = ref<Note[]>([]);
 let currNote = ref<Note | null>(null);
@@ -28,7 +30,7 @@ async function getUserNotes() {
                 content: el.content,
                 dateOfCreation: Number(el.dateOfCreation),
                 dateOfLastChange: Number(el.dateOfLastChange),
-                color: null,
+                color: el.color,
             });
         });
     } else {
@@ -73,13 +75,7 @@ onMounted(() => {
         <v-card class="note" v-for="note in notes" @click="currNote = note" :color="note.color ?? 'dark'" :title="note.title ?? '...'" :text="shortCardDesc(note.content ?? '...')"></v-card>
     </div>
 
-    <CurrentNote
-        @close="
-            currNote = null;
-            getUserNotes();
-        "
-        :note="currNote"
-        v-if="currNote != null" />
+    <CurrentNote @close="currNote = null" :note="currNote" v-if="currNote != null" />
 </template>
 
 <style scoped>

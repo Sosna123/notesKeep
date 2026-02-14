@@ -160,7 +160,7 @@ app.post(
                 res.status(200).json({ accessToken });
             }
         });
-    }
+    },
 );
 
 // user routes
@@ -206,8 +206,10 @@ app.post(
         const note = req.body;
         const user = res.locals.user;
 
-        if (note.user_id == null || note.user_id !== user.id) {
-            return res.status(403).send(responses.noPermission);
+        console.log(req.body);
+
+        if (note.title == "" || note.content == "") {
+            return res.status(403).send(responses.notEnoughInfo);
         } else {
             next();
         }
@@ -218,8 +220,12 @@ app.post(
         let currDate = Number(new Date()).toString();
         res.locals.currDate = currDate;
 
-        const addNoteQuery = "INSERT INTO notes VALUES (NULL, ?, ?, ?, ?, ?)";
-        db.query(addNoteQuery, [user.id, note.title, note.content, currDate, currDate], (err, results) => {
+        if (note.color == null) {
+            note.color = "default";
+        }
+
+        const addNoteQuery = "INSERT INTO notes VALUES (NULL, ?, ?, ?, ?, ?, ?)";
+        db.query(addNoteQuery, [user.id, note.title, note.content, currDate, currDate, note.color], (err, results) => {
             if (err) {
                 console.error(err);
                 return res.status(500).send(responses.serverError);
@@ -243,7 +249,7 @@ app.post(
                 res.status(200).json(results[0]);
             }
         });
-    }
+    },
 );
 
 app.put(
@@ -293,7 +299,7 @@ app.put(
                 res.status(200).json(results[0]);
             }
         });
-    }
+    },
 );
 
 app.delete(
@@ -323,7 +329,7 @@ app.delete(
                 res.status(200).send("Note deleted successfully");
             }
         });
-    }
+    },
 );
 
 // listen

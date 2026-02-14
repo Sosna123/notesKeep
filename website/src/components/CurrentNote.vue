@@ -42,7 +42,7 @@ function close() {
 
 <template>
     <div id="currNoteContainer">
-        <v-card v-if="props.note != null">
+        <v-card v-if="props.note != null" :color="props.note.color ?? 'dark'">
             <template v-slot:title id="titleSlot">
                 <div>
                     <div>

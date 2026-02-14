@@ -25,7 +25,8 @@ async function refreshToken() {
 
 if ((!localStorage.getItem("accessToken") || !localStorage.getItem("refreshToken")) && router.currentRoute.value.path != "/login") {
     router.push("/login");
-} else {
+}
+if (localStorage.getItem("accessToken") || localStorage.getItem("refreshToken")) {
     refreshToken();
 }
 </script>
