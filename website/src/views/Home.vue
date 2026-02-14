@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import NotesDisplay from "../components/NotesDisplay.vue";
 import CreateNote from "../components/CreateNote.vue";
+import { useRouter } from "vue-router";
 import { ref } from "vue";
+import { apiUri } from "../exports";
+const router = useRouter();
 let createNote = ref<boolean>(false);
 let updateNotes = ref<number>(0);
 
@@ -9,9 +12,25 @@ function noteCreated(wasCreated: boolean) {
     createNote.value = false;
 
     if (wasCreated == true) {
-        console.log(`UPDATENOTES ${updateNotes.value}`);
         updateNotes.value++;
-        console.log(`UPDATENOTES ${updateNotes.value}`);
+    }
+}
+
+async function logout() {
+    const data = await fetch(`${apiUri}/logout`, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            token: localStorage.getItem("refreshToken"),
+        }),
+    });
+
+    if (await data.ok) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        router.push("/login");
     }
 }
 </script>
@@ -25,6 +44,7 @@ function noteCreated(wasCreated: boolean) {
             }
         " />
     <div id="controls" class="bg-white">
+        <v-btn color="warning" @click="logout()">Log out</v-btn>
         <v-btn color="success" @click="createNote = true">Create New Note</v-btn>
     </div>
     <NotesDisplay :updateNotes="updateNotes" />

@@ -7,6 +7,7 @@ const props = defineProps<{
 const emit = defineEmits<{
     (e: "close"): void;
 }>();
+let colorMode = ref<"rgb" | "hex">("hex");
 
 function formatDate(timestamp: number | null): string {
     if (timestamp == null) return "Unknown date";
@@ -18,6 +19,8 @@ function formatDate(timestamp: number | null): string {
 async function updateNote() {
     currModified.value = Number(new Date());
     props.note.dateOfLastChange = currModified.value;
+
+    console.log(props.note);
 
     const data = await fetch(`${apiUri}/notes/modify`, {
         method: "PUT",
@@ -61,6 +64,26 @@ function close() {
             <template v-slot:actions>
                 <div>
                     <v-btn @click="close()">close</v-btn>
+                </div>
+                <div>
+                    <v-dialog>
+                        <template v-slot:activator="{ props: activatorProps }">
+                            <v-btn v-bind="activatorProps">changeColor</v-btn>
+                        </template>
+                        <template v-slot:default="{ isActive }">
+                            <v-container id="colorPickerContainer">
+                                <v-color-picker v-model="props.note.color" :mode="colorMode"> </v-color-picker>
+                                <v-select :items="['rgb', 'hex']" v-model="colorMode"></v-select>
+                                <v-btn
+                                    @click="
+                                        isActive.value = false;
+                                        updateNote();
+                                    "
+                                    >X</v-btn
+                                >
+                            </v-container>
+                        </template>
+                    </v-dialog>
                 </div>
             </template>
         </v-card>

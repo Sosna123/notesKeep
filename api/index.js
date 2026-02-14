@@ -113,18 +113,29 @@ app.post("/login", (req, res) => {
     });
 });
 
-app.delete("/logout", (req, res) => {
-    const refreshToken = req.body.token;
-    const deleteTokenQuery = "DELETE FROM refreshTokens WHERE token = ?";
-    db.query(deleteTokenQuery, [refreshToken], (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).send(responses.serverError);
+app.delete(
+    "/logout",
+    (req, res, next) => {
+        const refreshToken = req.body.token;
+        if (refreshToken == null) {
+            return res.status(401).send(responses.noTokenProvided);
         } else {
-            res.status(200).send("Logged out successfully");
+            next();
         }
-    });
-});
+    },
+    (req, res) => {
+        const refreshToken = req.body.token;
+        const deleteTokenQuery = "DELETE FROM refreshTokens WHERE token = ?";
+        db.query(deleteTokenQuery, [refreshToken], (err, results) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send(responses.serverError);
+            } else {
+                res.status(200).send("Logged out successfully");
+            }
+        });
+    },
+);
 
 app.post(
     "/token",
@@ -272,8 +283,8 @@ app.put(
         let currDate = Number(new Date()).toString();
         res.locals.currDate = currDate;
 
-        const modifyNoteQuery = "UPDATE notes SET title = ?, content = ?, dateOfLastChange = ? WHERE id = ? AND user_id = ?";
-        db.query(modifyNoteQuery, [note.title, note.content, currDate, note.id, note.user_id], (err, results) => {
+        const modifyNoteQuery = "UPDATE notes SET title = ?, content = ?, dateOfLastChange = ?, color = ? WHERE id = ? AND user_id = ?";
+        db.query(modifyNoteQuery, [note.title, note.content, currDate, note.color, /* where */ note.id, note.user_id], (err, results) => {
             if (err) {
                 console.error(err);
                 return res.status(500).send(responses.serverError);
