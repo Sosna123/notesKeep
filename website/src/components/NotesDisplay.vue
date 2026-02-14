@@ -68,6 +68,13 @@ function shortCardDesc(text: string): string {
 onMounted(() => {
     getUserNotes();
 });
+
+watch(
+    () => props.updateNotes,
+    () => {
+        getUserNotes();
+    },
+);
 </script>
 
 <template>
