@@ -8,7 +8,7 @@ const props = defineProps({ updateNotes: Number });
 const notes = ref<Note[]>([]);
 let currNote = ref<Note | null>(null);
 
-async function getUserNotes() {
+async function getUserNotes(): Promise<number> {
     notes.value = [];
     notes.value.length = 0;
 
@@ -33,8 +33,11 @@ async function getUserNotes() {
                 color: el.color,
             });
         });
+
+        return 1;
     } else {
         console.error("Failed to fetch notes");
+        return -1;
     }
 }
 
@@ -65,8 +68,11 @@ function shortCardDesc(text: string): string {
     }
 }
 
-onMounted(() => {
-    getUserNotes();
+onMounted(async () => {
+    // wait for refreshed token
+    setTimeout(() => {
+        getUserNotes();
+    }, 50);
 });
 
 watch(

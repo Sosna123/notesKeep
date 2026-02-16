@@ -55,7 +55,9 @@ async function checkHashedPassword(password, hash) {
 
 function generateAccessToken(user) {
     return jwt.sign(user, process.env.JWT_ACCESS_SECRET, { expiresIn: "30min" });
+    // return jwt.sign(user, process.env.JWT_ACCESS_SECRET, { expiresIn: "10000" });
 }
+
 function generateRefreshToken(user) {
     let token = jwt.sign(user, process.env.JWT_REFRESH_SECRET);
     const addTokenQuery = "INSERT INTO refreshTokens VALUES(NULL, ?)";

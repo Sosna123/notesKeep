@@ -3,6 +3,9 @@ import { ref } from "vue";
 import { apiUri } from "../../exports";
 import { useRouter } from "vue-router";
 const router = useRouter();
+const emit = defineEmits({
+    loggedIn: null,
+});
 
 let formValues = ref<{ email: string; password: string }>({ email: "", password: "" });
 
@@ -19,6 +22,7 @@ async function submitForm() {
         localStorage.setItem("accessToken", result.accessToken);
         localStorage.setItem("refreshToken", result.refreshToken);
         router.push("/");
+        emit("loggedIn");
     } else {
         console.log("Login failed:", result);
     }
