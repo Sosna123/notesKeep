@@ -88,7 +88,15 @@ watch(
         <v-card class="note" v-for="note in notes" @click="currNote = note" :color="note.color ?? 'dark'" :title="note.title ?? '...'" :text="shortCardDesc(note.content ?? '...')"></v-card>
     </div>
 
-    <CurrentNote @close="currNote = null" :note="currNote" v-if="currNote != null" />
+    <CurrentNote
+        @close="
+            (isDeleted: boolean) => {
+                currNote = null;
+                isDeleted == true ? getUserNotes() : null;
+            }
+        "
+        :note="currNote"
+        v-if="currNote != null" />
 </template>
 
 <style scoped>

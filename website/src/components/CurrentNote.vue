@@ -5,7 +5,7 @@ const props = defineProps<{
     note: Note;
 }>();
 const emit = defineEmits<{
-    (e: "close"): void;
+    close: [boolean];
 }>();
 let colorMode = ref<"rgb" | "hex">("hex");
 
@@ -19,8 +19,6 @@ function formatDate(timestamp: number | null): string {
 async function updateNote() {
     currModified.value = Number(new Date());
     props.note.dateOfLastChange = currModified.value;
-
-    console.log(props.note);
 
     const data = await fetch(`${apiUri}/notes/modify`, {
         method: "PUT",
@@ -36,10 +34,25 @@ async function updateNote() {
     }
 }
 
+async function deleteNote() {
+    const data = await fetch(`${apiUri}/notes/delete`, {
+        method: "delete",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        body: JSON.stringify(props.note),
+    });
+
+    if (data.ok) {
+        emit("close", true);
+    }
+}
+
 let currModified = ref<number>(props.note?.dateOfLastChange ?? 0);
 function close() {
     currModified.value = 0;
-    emit("close");
+    emit("close", false);
 }
 </script>
 
@@ -64,6 +77,7 @@ function close() {
             <template v-slot:actions>
                 <div>
                     <v-btn @click="close()">close</v-btn>
+                    <v-btn @click="deleteNote()">delete</v-btn>
                 </div>
                 <div>
                     <v-dialog>
