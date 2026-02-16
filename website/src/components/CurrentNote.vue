@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import YesNoModal from "./YesNoModal.vue";
 import { apiUri, type Note } from "../exports";
 import { ref } from "vue";
 const props = defineProps<{
@@ -8,6 +9,7 @@ const emit = defineEmits<{
     close: [boolean];
 }>();
 let colorMode = ref<"rgb" | "hex">("hex");
+let deleteModalOpen = ref<boolean>(false);
 
 function formatDate(timestamp: number | null): string {
     if (timestamp == null) return "Unknown date";
@@ -54,9 +56,22 @@ function close() {
     currModified.value = 0;
     emit("close", false);
 }
+
+function openDeleteModal() {
+    deleteModalOpen.value = true;
+}
 </script>
 
 <template>
+    <YesNoModal
+        v-show="deleteModalOpen"
+        message="Do you want to delete this note?"
+        @close="
+            (isDeleted: boolean) => {
+                deleteModalOpen = false;
+                isDeleted == true ? deleteNote() : null;
+            }
+        " />
     <div id="currNoteContainer">
         <v-card v-if="props.note != null" :color="props.note.color ?? 'dark'">
             <template v-slot:title id="titleSlot">
@@ -77,7 +92,7 @@ function close() {
             <template v-slot:actions>
                 <div>
                     <v-btn @click="close()">close</v-btn>
-                    <v-btn @click="deleteNote()">delete</v-btn>
+                    <v-btn @click="openDeleteModal()">delete</v-btn>
                 </div>
                 <div>
                     <v-dialog>
