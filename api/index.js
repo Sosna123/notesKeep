@@ -17,6 +17,8 @@ const responses = {
     serverError: "Internal server error",
     wrongCredentials: "Wrong credentials",
     notEnoughInfo: "Not enough information provided",
+    alreadyExistsEmail: "User with this email already exists",
+    alreadyExistsUsername: "User with this username already exists",
 };
 
 app.use(morgan("dev"));
@@ -207,6 +209,98 @@ app.get("/user/notes", checkAccessToken, (req, res) => {
         } else {
             const notesArr = results;
             res.status(200).json(notesArr);
+        }
+    });
+});
+
+app.post(
+    "/user/create",
+    (req, res, next) => {
+        const user = req.body;
+
+        if (user.email == null || user.password == null || user.username == null) {
+            return res.status(403).send(responses.notEnoughInfo);
+        } else {
+            next();
+        }
+    },
+    async (req, res, next) => {
+        const user = req.body;
+        res.locals.hashedPassword = await hashPassword(user.password);
+
+        if (res.locals.hashedPassword == -1) {
+            return res.status(500).send(responses.serverError);
+        } else {
+            next();
+        }
+    },
+    (req, res, next) => {
+        const user = req.body;
+
+        const checkEmailUniquenessQuery = "SELECT email FROM users WHERE email = ?";
+        db.query(checkEmailUniquenessQuery, [user.email], (err, results) => {
+            if (err) {
+                return res.status(500).send(responses.serverError);
+            } else if (results.length > 0) {
+                return res.status(409).send(responses.alreadyExistsEmail);
+            } else {
+                next();
+            }
+        });
+    },
+    (req, res, next) => {
+        const user = req.body;
+
+        const checkUsernameUniquenessQuery = "SELECT username FROM users WHERE username = ?";
+        db.query(checkUsernameUniquenessQuery, [user.username], (err, results) => {
+            if (err) {
+                return res.status(500).send(responses.serverError);
+            } else if (results.length > 0) {
+                return res.status(409).send(responses.alreadyExistsUsername);
+            } else {
+                next();
+            }
+        });
+    },
+    (req, res, next) => {
+        const user = req.body;
+
+        db.query("INSERT INTO users VALUES(NULL, ?, ?, ?)", [user.email, res.locals.hashedPassword, user.username], (err, results) => {
+            if (err) {
+                return res.status(500).send(responses.serverError);
+            } else if (results.affectedRows == 1) {
+                next();
+            }
+        });
+    },
+    (req, res) => {
+        const user = req.body;
+        db.query("SELECT * FROM users WHERE email = ? AND password = ? AND username = ?", [user.email, res.locals.hashedPassword, user.username], (err, results) => {
+            if (err) {
+                return res.status(500).send(responses.serverError);
+            } else if (results.length == 1) {
+                res.status(200).json({
+                    accessToken: generateAccessToken(results[0]),
+                    refreshToken: generateRefreshToken(results[0]),
+                });
+            } else {
+                return res.status(500).send(responses.serverError);
+            }
+        });
+    },
+);
+
+app.delete("/user/delete", checkAccessToken, (req, res, next) => {
+    const user = res.locals.user;
+
+    const deleteUserQuery = "DELETE FROM users WHERE id = ?";
+    db.query(deleteUserQuery, [user.id], (err, results) => {
+        if (err) {
+            return res.status(500).send(responses.serverError);
+        } else if ((results.affectedRows = 1)) {
+            return res.status(200).send("Successfully deleted the account");
+        } else {
+            return res.status(500).send(responses.serverError);
         }
     });
 });
