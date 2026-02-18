@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import YesNoModal from "./reusable/YesNoModal.vue";
-import { apiUri, type Note } from "../exports";
+import YesNoModal from "@/components/reusable/YesNoModal.vue";
+import { apiUri, type Note } from "@/exports";
 import { ref } from "vue";
 const props = defineProps<{
     note: Note;

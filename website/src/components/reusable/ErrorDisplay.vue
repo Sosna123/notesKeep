@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { watch } from "vue";
-import { errorDisplayInfo } from "../../exports";
+import { errorDisplayInfo } from "@/exports";
 const emit = defineEmits<{
     close: [null];
 }>();

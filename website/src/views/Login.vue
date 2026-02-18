@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
-import LoginForm from "../components/Login/LoginForm.vue";
-import SignUpForm from "../components/Login/SignUpForm.vue";
+import LoginForm from "@/components/Login/LoginForm.vue";
+import SignUpForm from "@/components/Login/SignUpForm.vue";
 const router = useRouter();
 const emit = defineEmits<{
     loggedIn: [null];

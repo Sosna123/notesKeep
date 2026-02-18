@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
-import { apiUri, errorDisplayInfo } from "./exports";
-import ErrorDisplay from "./components/reusable/ErrorDisplay.vue";
+import { apiUri, errorDisplayInfo } from "@/exports";
+import ErrorDisplay from "@/components/reusable/ErrorDisplay.vue";
 const router = useRouter();
 let refreshInterval: number | null = null;
 

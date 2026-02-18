@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
-import { apiUri, type Note } from "../exports";
-import CurrentNote from "../components/CurrentNote.vue";
+import { apiUri, type Note } from "@/exports.ts";
+import CurrentNote from "@/components/CurrentNote.vue";
 
 const props = defineProps({ updateNotes: Number });
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { apiUri, type Note } from "../exports";
+import { apiUri, type Note } from "@/exports";
 import { ref } from "vue";
 const emit = defineEmits<{
     close: [boolean];

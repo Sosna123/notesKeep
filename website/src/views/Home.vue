@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import NotesDisplay from "../components/NotesDisplay.vue";
-import CreateNote from "../components/CreateNote.vue";
+import NotesDisplay from "@/components/NotesDisplay.vue";
+import CreateNote from "@/components/CreateNote.vue";
 import { useRouter } from "vue-router";
 import { ref } from "vue";
-import { apiUri } from "../exports";
+import { apiUri } from "@/exports";
 const router = useRouter();
 const emit = defineEmits<{
     logout: [null];

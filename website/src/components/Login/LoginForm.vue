@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { apiUri } from "../../exports";
+import { apiUri } from "@/exports";
 import { useRouter } from "vue-router";
 const router = useRouter();
 const emit = defineEmits<{
