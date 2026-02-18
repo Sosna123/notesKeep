@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { watch } from "vue";
 import { errorDisplayInfo } from "../../exports";
-const props = defineProps<{
-    message: string;
-}>();
 const emit = defineEmits<{
     close: [null];
 }>();
@@ -11,15 +8,18 @@ const emit = defineEmits<{
 let turnOffTimeout: number = -1;
 
 function closeComponent() {
+    clearTimeout(turnOffTimeout);
     errorDisplayInfo.value.show = false;
 }
 
 watch(
-    () => props.message,
+    () => errorDisplayInfo.value.show,
     () => {
-        turnOffTimeout = setTimeout(() => {
-            closeComponent();
-        }, 10 * 1000);
+        if (errorDisplayInfo.value.show) {
+            turnOffTimeout = setTimeout(() => {
+                closeComponent();
+            }, 5 * 1000);
+        }
     },
 );
 </script>
@@ -28,7 +28,7 @@ watch(
     <v-container id="errorDisplay">
         <div id="flexErrorDisplay">
             <div>
-                {{ props.message }}
+                {{ errorDisplayInfo.message }}
             </div>
             <v-btn @click="closeComponent()">close</v-btn>
         </div>

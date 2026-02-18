@@ -1,13 +1,9 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { apiUri, errorDisplayInfo } from "./exports";
 import ErrorDisplay from "./components/reusable/ErrorDisplay.vue";
 const router = useRouter();
 let refreshInterval: number | null = null;
-
-let currErrorMessage = ref<string>("");
-let showErrorMessage = ref<boolean>(false);
 
 async function refreshToken() {
     const data = await fetch(`${apiUri}/token`, {
@@ -58,7 +54,7 @@ function clearRefreshInterval() {
 
 <template>
     <router-view @loggedIn="setRefreshInterval()" @logout="clearRefreshInterval()" />
-    <ErrorDisplay v-show="errorDisplayInfo.show" :message="errorDisplayInfo.message" />
+    <ErrorDisplay v-show="errorDisplayInfo.show" />
 </template>
 
 <style scoped></style>

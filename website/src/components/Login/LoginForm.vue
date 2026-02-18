@@ -30,7 +30,7 @@ async function submitForm() {
 </script>
 
 <template>
-    <v-form>
+    <v-form @keyup.enter="submitForm()">
         <v-text-field label="Email" required v-model="formValues.email"></v-text-field>
         <v-text-field label="Password" type="password" required v-model="formValues.password"></v-text-field>
         <v-btn color="primary" @click="submitForm()">Login</v-btn>
