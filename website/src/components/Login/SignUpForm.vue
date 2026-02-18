@@ -2,21 +2,30 @@
 import { ref } from "vue";
 import { apiUri } from "../../exports";
 import { useRouter } from "vue-router";
+import ErrorDisplay from "../reusable/ErrorDisplay.vue";
 const router = useRouter();
-const emit = defineEmits({
-    loggedIn: null,
-});
+const emit = defineEmits<{
+    loggedIn: [null];
+}>();
+
+let currErrorMessage = ref<string>("");
+let showError = ref<boolean>(false);
 
 let formValues = ref<{ email: string; username: string; password: string; password2: string }>({ email: "", username: "", password: "", password2: "" });
 
 async function submitForm() {
-    console.log(formValues.value.password.length >= 8, formValues.value.password.match(/\d/g) !== null, formValues.value.password.match(/[a-z]/g) !== null);
     if (formValues.value.email == "" || formValues.value.username == "" || formValues.value.password == "" || formValues.value.password2 == "") {
+        currErrorMessage.value = "Empty fields";
+        showError.value = true;
         return -1;
     } else if (formValues.value.password != formValues.value.password2) {
+        currErrorMessage.value = "Passwords don't match";
+        showError.value = true;
         return -1;
     } // length < 8 and contains numbers, lowercase letters, uppercase letters
     else if (formValues.value.password.length < 8 || formValues.value.password.match(/\d/g) == null || formValues.value.password.match(/[a-z]/g) === null || formValues.value.password.match(/[A-Z]/g) === null) {
+        currErrorMessage.value = "Passwords must be 8 characters or longer, contain numbers, lowercase and uppercase letters";
+        showError.value = true;
         return -1;
     }
 
@@ -32,7 +41,7 @@ async function submitForm() {
         localStorage.setItem("accessToken", result.accessToken);
         localStorage.setItem("refreshToken", result.refreshToken);
         router.push("/");
-        emit("loggedIn");
+        emit("loggedIn", null);
     } else {
         console.log("Singing up failed:", result);
     }
@@ -47,6 +56,8 @@ async function submitForm() {
         <v-text-field label="Repeat password" type="password" required v-model="formValues.password2"></v-text-field>
         <v-btn color="primary" @click="submitForm()">Login</v-btn>
     </v-form>
+
+    <ErrorDisplay v-show="showError" :message="currErrorMessage" @close="showError = false" />
 </template>
 
 <style scoped></style>

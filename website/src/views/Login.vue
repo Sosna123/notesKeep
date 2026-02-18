@@ -4,9 +4,9 @@ import { useRouter } from "vue-router";
 import LoginForm from "../components/Login/LoginForm.vue";
 import SignUpForm from "../components/Login/SignUpForm.vue";
 const router = useRouter();
-const emit = defineEmits({
-    loggedIn: null,
-});
+const emit = defineEmits<{
+    loggedIn: [null];
+}>();
 
 let login = ref<boolean>(true);
 
@@ -17,8 +17,8 @@ if (localStorage.getItem("accessToken") && localStorage.getItem("refreshToken"))
 
 <template>
     <div id="form">
-        <LoginForm v-if="login" @loggedIn="emit('loggedIn')" />
-        <SignUpForm v-else @loggedIn="emit('loggedIn')" />
+        <LoginForm v-if="login" @loggedIn="emit('loggedIn', null)" />
+        <SignUpForm v-else @loggedIn="emit('loggedIn', null)" />
         <v-btn text @click="login = !login">
             {{ login ? "Don't have an account? Sign Up" : "Already have an account? Login" }}
         </v-btn>

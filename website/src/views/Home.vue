@@ -5,9 +5,9 @@ import { useRouter } from "vue-router";
 import { ref } from "vue";
 import { apiUri } from "../exports";
 const router = useRouter();
-const emit = defineEmits({
-    logout: null,
-});
+const emit = defineEmits<{
+    logout: [null];
+}>();
 
 let createNote = ref<boolean>(false);
 let updateNotes = ref<number>(0);
@@ -34,7 +34,7 @@ async function logout() {
     if (await data.ok) {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
-        emit("logout");
+        emit("logout", null);
         router.push("/login");
     }
 }
