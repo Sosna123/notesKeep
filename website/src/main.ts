@@ -9,7 +9,8 @@ import Login from "./views/Login.vue";
 
 const routes = [
     { path: "/", component: Home },
-    { path: "/login", component: Login },
+    { path: "/login", name: "loginForm", component: Login },
+    { path: "/signup", name: "signUpForm", component: Login },
 ];
 
 export const router = createRouter({

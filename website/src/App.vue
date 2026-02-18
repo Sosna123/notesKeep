@@ -24,7 +24,7 @@ async function refreshToken() {
     }
 }
 
-if ((!localStorage.getItem("accessToken") || !localStorage.getItem("refreshToken")) && router.currentRoute.value.path != "/login") {
+if (((!localStorage.getItem("accessToken") || !localStorage.getItem("refreshToken")) && router.currentRoute.value.name == "loginForm") || router.currentRoute.value.name == "signUpForm") {
     router.push("/login");
 }
 if (localStorage.getItem("accessToken") || localStorage.getItem("refreshToken")) {

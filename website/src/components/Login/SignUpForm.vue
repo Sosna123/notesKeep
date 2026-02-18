@@ -54,7 +54,7 @@ async function submitForm() {
         <v-text-field label="Username" required v-model="formValues.username"></v-text-field>
         <v-text-field label="Password" type="password" required v-model="formValues.password"></v-text-field>
         <v-text-field label="Repeat password" type="password" required v-model="formValues.password2"></v-text-field>
-        <v-btn color="primary" @click="submitForm()">Login</v-btn>
+        <v-btn color="primary" @click="submitForm()">Sign up</v-btn>
     </v-form>
 
     <ErrorDisplay v-show="showError" :message="currErrorMessage" @close="showError = false" />
