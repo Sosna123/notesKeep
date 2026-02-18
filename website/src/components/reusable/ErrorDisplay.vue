@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { watch } from "vue";
+import { errorDisplayInfo } from "../../exports";
 const props = defineProps<{
     message: string;
 }>();
@@ -10,8 +11,7 @@ const emit = defineEmits<{
 let turnOffTimeout: number = -1;
 
 function closeComponent() {
-    clearTimeout(turnOffTimeout);
-    emit("close", null);
+    errorDisplayInfo.value.show = false;
 }
 
 watch(

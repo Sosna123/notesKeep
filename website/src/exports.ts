@@ -1,3 +1,5 @@
+import { ref } from "vue";
+
 export const apiUri = "http://localhost:3000";
 
 export type Note = {
@@ -9,3 +11,8 @@ export type Note = {
     dateOfLastChange: number | null;
     color: string | null;
 };
+
+export const errorDisplayInfo = ref<{ message: string; show: boolean }>({
+    message: "",
+    show: false,
+});
