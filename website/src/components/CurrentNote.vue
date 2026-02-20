@@ -73,7 +73,7 @@ function close() {
                 <v-divider></v-divider>
             </template>
             <template v-slot:text>
-                <v-textarea v-model="props.note.content" max-rows="25" auto-grow @change="updateNote()"></v-textarea>
+                <v-textarea v-model="props.note.content" max-rows="18" rows="18" auto-grow @change="updateNote()"></v-textarea>
             </template>
             <template v-slot:actions>
                 <div>
@@ -106,7 +106,8 @@ function close() {
 }
 
 #currNoteContainer > div.v-card {
-    width: 100%;
+    width: 60%;
+    height: 80%;
 }
 
 .v-card-title > div {

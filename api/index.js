@@ -19,6 +19,7 @@ const responses = {
     notEnoughInfo: "Not enough information provided",
     alreadyExistsEmail: "User with this email already exists",
     alreadyExistsUsername: "User with this username already exists",
+    alreadyExists: "This item already exists",
 };
 
 app.use(morgan("dev"));
@@ -89,8 +90,9 @@ function checkAccessToken(req, res, next) {
     });
 }
 
-// ROUTES
-// authentication routes
+//
+// AUTH ROUTES
+//
 app.post("/login", (req, res) => {
     const user = req.body;
 
@@ -178,7 +180,9 @@ app.post(
     },
 );
 
-// user routes
+//
+// USER ROUTES
+//
 app.get("/user/me", checkAccessToken, (req, res) => {
     const user = res.locals.user;
 
@@ -265,7 +269,7 @@ app.post(
     (req, res, next) => {
         const user = req.body;
 
-        db.query("INSERT INTO users VALUES(NULL, ?, ?, ?)", [user.email, res.locals.hashedPassword, user.username], (err, results) => {
+        db.query("INSERT INTO users VALUES(NULL, ?, ?, ?, ?)", [user.email, res.locals.hashedPassword, user.username, "[]"], (err, results) => {
             if (err) {
                 return res.status(500).send(responses.serverError);
             } else if (results.affectedRows == 1) {
@@ -305,7 +309,110 @@ app.delete("/user/delete", checkAccessToken, (req, res, next) => {
     });
 });
 
-// notes routes
+// tags
+app.get("/user/tags/", checkAccessToken, (req, res) => {
+    const getTagsQuery = "SELECT tags FROM users WHERE id = ?";
+    db.query(getTagsQuery, [res.locals.user.id], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send(responses.serverError);
+        } else {
+            res.status(200).json(JSON.parse(results[0].tags));
+        }
+    });
+});
+
+app.post(
+    "/user/tags/create",
+    checkAccessToken,
+    (req, res, next) => {
+        console.log(req.body);
+        if (req.body.tag == null || req.body.tag == "") {
+            return res.status(403).send(responses.notEnoughInfo);
+        } else {
+            next();
+        }
+    },
+    (req, res, next) => {
+        const getTagsQuery = "SELECT tags FROM users WHERE id = ?";
+        db.query(getTagsQuery, [res.locals.user.id], (err, results) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send(responses.serverError);
+            } else {
+                res.locals.tags = JSON.parse(results[0].tags);
+                next();
+            }
+        });
+    },
+    (req, res, next) => {
+        if (!res.locals.tags.includes(req.body.tag)) {
+            res.locals.tags.push(req.body.tag);
+            next();
+        } else {
+            return res.status(409).send(responses.alreadyExists);
+        }
+    },
+    (req, res, next) => {
+        const getTagsQuery = "UPDATE users SET tags = ? WHERE id = ?";
+        db.query(getTagsQuery, [JSON.stringify(res.locals.tags), res.locals.user.id], (err, results) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send(responses.serverError);
+            } else {
+                res.status(200).json(res.locals.tags);
+            }
+        });
+    },
+);
+
+app.delete(
+    "/user/tags/delete",
+    checkAccessToken,
+    (req, res, next) => {
+        console.log(req.body);
+        if (req.body.tag == null || req.body.tag == "") {
+            return res.status(403).send(responses.notEnoughInfo);
+        } else {
+            next();
+        }
+    },
+    (req, res, next) => {
+        const getTagsQuery = "SELECT tags FROM users WHERE id = ?";
+        db.query(getTagsQuery, [res.locals.user.id], (err, results) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send(responses.serverError);
+            } else {
+                res.locals.tags = JSON.parse(results[0].tags);
+                next();
+            }
+        });
+    },
+    (req, res, next) => {
+        if (res.locals.tags.includes(req.body.tag)) {
+            res.locals.tags.splice(res.locals.tags.indexOf(req.body.tag), 1);
+            next();
+        } else {
+            return res.status(404).send(responses.notFound);
+        }
+    },
+    (req, res, next) => {
+        const getTagsQuery = "UPDATE users SET tags = ? WHERE id = ?";
+        db.query(getTagsQuery, [JSON.stringify(res.locals.tags), res.locals.user.id], (err, results) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send(responses.serverError);
+            } else {
+                res.status(200).json(res.locals.tags);
+            }
+        });
+    },
+);
+
+//
+// NOTES ROUTES
+//
 app.post(
     "/notes/create",
     checkAccessToken,
