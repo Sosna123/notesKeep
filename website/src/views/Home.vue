@@ -48,9 +48,9 @@ async function logout() {
                 noteCreated(wasCreated);
             }
         " />
-    <div id="controls" class="bg-white">
+    <div id="controls" class="bg-grey-darken-4">
         <v-btn color="warning" @click="logout()">Log out</v-btn>
-        <v-btn color="success" @click="createNote = true">Create New Note</v-btn>
+        <v-btn color="success" @click="createNote = true"><v-icon size="x-large" icon="mdi-plus"></v-icon></v-btn>
     </div>
     <NotesDisplay :updateNotes="updateNotes" />
 </template>
@@ -58,9 +58,10 @@ async function logout() {
 <style scoped>
 #controls {
     display: flex;
-    flex-direction: row-reverse;
+    flex-direction: row;
     margin: 0 0 20px 0;
     padding: 20px;
     width: 100%;
+    justify-content: space-between;
 }
 </style>

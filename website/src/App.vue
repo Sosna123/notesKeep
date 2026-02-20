@@ -53,8 +53,10 @@ function clearRefreshInterval() {
 </script>
 
 <template>
-    <router-view @loggedIn="setRefreshInterval()" @logout="clearRefreshInterval()" />
-    <ErrorDisplay v-show="errorDisplayInfo.show" />
+    <div class="bg-grey-darken-3" style="min-height: 100vh">
+        <router-view @loggedIn="setRefreshInterval()" @logout="clearRefreshInterval()" />
+        <ErrorDisplay v-show="errorDisplayInfo.show" />
+    </div>
 </template>
 
 <style scoped></style>

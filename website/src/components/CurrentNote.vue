@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import YesNoModal from "@/components/reusable/YesNoModal.vue";
+import ColorPicker from "@/components/reusable/ColorPicker.vue";
 import { apiUri, type Note } from "@/exports";
 import { ref } from "vue";
 const props = defineProps<{
@@ -8,8 +9,6 @@ const props = defineProps<{
 const emit = defineEmits<{
     close: [boolean];
 }>();
-let colorMode = ref<"rgb" | "hex">("hex");
-let deleteModalOpen = ref<boolean>(false);
 
 function formatDate(timestamp: number | null): string {
     if (timestamp == null) return "Unknown date";
@@ -56,22 +55,9 @@ function close() {
     currModified.value = 0;
     emit("close", false);
 }
-
-function openDeleteModal() {
-    deleteModalOpen.value = true;
-}
 </script>
 
 <template>
-    <YesNoModal
-        v-show="deleteModalOpen"
-        message="Do you want to delete this note?"
-        @close="
-            (isDeleted: boolean) => {
-                deleteModalOpen = false;
-                isDeleted == true ? deleteNote() : null;
-            }
-        " />
     <div id="currNoteContainer">
         <v-card v-if="props.note != null" :color="props.note.color ?? 'dark'">
             <template v-slot:title id="titleSlot">
@@ -91,28 +77,13 @@ function openDeleteModal() {
             </template>
             <template v-slot:actions>
                 <div>
-                    <v-btn @click="close()">close</v-btn>
-                    <v-btn @click="openDeleteModal()">delete</v-btn>
-                </div>
-                <div>
-                    <v-dialog>
-                        <template v-slot:activator="{ props: activatorProps }">
-                            <v-btn v-bind="activatorProps">changeColor</v-btn>
-                        </template>
-                        <template v-slot:default="{ isActive }">
-                            <v-container id="colorPickerContainer">
-                                <v-color-picker v-model="props.note.color" :mode="colorMode"> </v-color-picker>
-                                <v-select :items="['rgb', 'hex']" v-model="colorMode"></v-select>
-                                <v-btn
-                                    @click="
-                                        isActive.value = false;
-                                        updateNote();
-                                    "
-                                    >X</v-btn
-                                >
-                            </v-container>
-                        </template>
-                    </v-dialog>
+                    <div>
+                        <v-btn @click="close()" class="bg-success"><v-icon size="x-large" icon="mdi-check"></v-icon></v-btn>
+                    </div>
+                    <div>
+                        <YesNoModal message="Do you want to delete this note?" iconBtn="mdi-trash-can" colorBtn="bg-error" :colorBg="note.color!" @deleteNote="deleteNote()" />
+                        <ColorPicker :note="note" />
+                    </div>
                 </div>
             </template>
         </v-card>
@@ -145,10 +116,29 @@ function openDeleteModal() {
     flex-direction: row;
 }
 
+.v-card-actions > div {
+    display: flex;
+    flex-direction: row;
+    padding-left: 15px;
+    width: 100%;
+    padding: 0 10px;
+    justify-content: space-between;
+}
+
+.v-card-actions > div > div {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    padding-left: 15px;
+    margin: 0;
+    padding: 0;
+}
+
 .v-card-title > div > div:nth-child(1) {
     text-align: right;
     font-size: 125%;
 }
+
 .v-card-title > div > div:nth-child(2) {
     text-align: right;
     font-size: 75%;

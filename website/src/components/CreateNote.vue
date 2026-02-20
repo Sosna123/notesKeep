@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { apiUri, type Note } from "@/exports";
 import { ref } from "vue";
+import ColorPicker from "@/components/reusable/ColorPicker.vue";
 const emit = defineEmits<{
     close: [boolean];
 }>();
-
-let colorMode = ref<"rgb" | "hex">("hex");
 
 let newNote = ref<Note>({
     id: -1,
@@ -14,7 +13,7 @@ let newNote = ref<Note>({
     content: "",
     dateOfCreation: -1,
     dateOfLastChange: -1,
-    color: "#212121",
+    color: "#070707",
 });
 
 async function addNote() {
@@ -60,22 +59,13 @@ function close() {
             </template>
             <template v-slot:actions>
                 <div>
-                    <v-btn class="bg-success" @click="addNote()">add</v-btn>
-                    <v-btn class="bg-error" @click="close()">close</v-btn>
-                </div>
-                <div>
-                    <v-dialog>
-                        <template v-slot:activator="{ props: activatorProps }">
-                            <v-btn v-bind="activatorProps">changeColor</v-btn>
-                        </template>
-                        <template v-slot:default="{ isActive }">
-                            <v-container id="colorPickerContainer">
-                                <v-color-picker v-model="newNote.color" :mode="colorMode"> </v-color-picker>
-                                <v-select :items="['rgb', 'hex']" v-model="colorMode"></v-select>
-                                <v-btn @click="isActive.value = false">X</v-btn>
-                            </v-container>
-                        </template>
-                    </v-dialog>
+                    <div>
+                        <v-btn class="bg-success" @click="addNote()"><v-icon size="x-large" icon="mdi-check"></v-icon></v-btn>
+                        <v-btn class="bg-error" @click="close()"><v-icon size="x-large" icon="mdi-close"></v-icon></v-btn>
+                    </div>
+                    <div>
+                        <ColorPicker :note="newNote" />
+                    </div>
                 </div>
             </template>
         </v-card>
@@ -111,17 +101,18 @@ function close() {
 .v-card-actions > div {
     display: flex;
     flex-direction: row;
-    gap: 15px;
     padding-left: 15px;
+    width: 100%;
+    padding: 0 10px;
+    justify-content: space-between;
 }
 
-#colorPickerContainer {
+.v-card-actions > div > div {
     display: flex;
-    flex-direction: column;
-    width: 360px;
-    height: 450px;
-    background-color: #212121;
-    text-align: center;
-    padding: 20px;
+    flex-direction: row;
+    gap: 15px;
+    padding-left: 15px;
+    margin: 0;
+    padding: 0;
 }
 </style>

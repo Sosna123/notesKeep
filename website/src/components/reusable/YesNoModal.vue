@@ -1,42 +1,58 @@
 <script setup lang="ts">
 const emit = defineEmits<{
-    close: [boolean];
+    deleteNote: [null];
 }>();
 const props = defineProps<{
     message: string;
+    iconBtn: string;
+    colorBtn: string;
+    colorBg: string;
 }>();
 </script>
 
 <template>
-    <v-container id="yesNoModalBg">
-        <v-card>
-            <p>{{ props.message }}</p>
-            <v-btn @click="emit('close', true)">Yes</v-btn>
-            <v-btn @click="emit('close', false)">No</v-btn>
-        </v-card>
-    </v-container>
+    <v-dialog>
+        <template v-slot:activator="{ props: activatorProps }">
+            <v-btn v-bind="activatorProps" :class="props.colorBtn"><v-icon :icon="props.iconBtn" size="x-large"></v-icon></v-btn>
+        </template>
+        <template v-slot:default="{ isActive }">
+            <v-card id="yesNoModal" :color="props.colorBg ?? 'dark'">
+                <p>{{ props.message }}</p>
+                <div id="yesNoBtns">
+                    <v-btn
+                        class="bg-success"
+                        @click="
+                            isActive.value = false;
+                            emit('deleteNote', null);
+                        "
+                        ><v-icon icon="mdi-check" size="x-large"></v-icon
+                    ></v-btn>
+                    <v-btn class="bg-error" @click="isActive.value = false"><v-icon icon="mdi-close" size="x-large"></v-icon></v-btn>
+                </div>
+            </v-card>
+        </template>
+    </v-dialog>
 </template>
 
 <style scoped>
-#yesNoModalBg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 2;
+#yesNoModal {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 40px;
-}
-
-#yesNoModalBg > div.v-card {
-    z-index: 3;
-    width: 300px;
-    height: 100px;
+    flex-direction: column;
+    width: 340px;
     text-align: center;
     padding: 20px;
+    gap: 10px;
+    border-radius: 4px;
+}
+
+#yesNoModal > #yesNoBtns {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-around;
+}
+
+.v-overlay .v-card {
+    margin: auto;
 }
 </style>

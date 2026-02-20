@@ -109,7 +109,7 @@ watch(
 
 #notesContainer > .note {
     min-width: 10%;
-    max-width: 25%;
+    max-width: 20%;
     cursor: pointer;
 }
 </style>
