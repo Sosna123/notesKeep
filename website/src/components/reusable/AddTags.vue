@@ -24,11 +24,6 @@ async function getTagList() {
     if (data.ok) {
         let tags = await data.json();
         tagList.value = [...tags];
-        tagList.value.sort((a: string, b: string) => {
-            if (props.note.tags.includes(a) && !props.note.tags.includes(b)) return -1;
-            else if (!props.note.tags.includes(a) && props.note.tags.includes(b)) return 1;
-            else return 0;
-        });
     }
 }
 
@@ -66,7 +61,7 @@ onMounted(() => {
         </template>
         <template v-slot:default="{ isActive }">
             <v-card id="addTags" :color="props.note.color ?? 'dark'">
-                <div>
+                <div id="addNewTagDiv">
                     <v-textarea v-model="newTag" placeholder="Add a new tag" rows="1" no-resize></v-textarea>
                     <v-btn @click="addNewTag()" class="bg-success"><v-icon size="x-large" icon="mdi-plus-circle-outline"></v-icon></v-btn>
                 </div>
@@ -105,5 +100,16 @@ onMounted(() => {
 
 .v-overlay .v-card {
     margin: auto;
+}
+
+#addNewTagDiv {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    height: 80px;
+}
+
+#addNewTagDiv > * {
+    height: 56px;
 }
 </style>

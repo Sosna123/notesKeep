@@ -85,7 +85,7 @@ watch(
                     </div>
                     <div>
                         Created: {{ formatDate(props.note.dateOfCreation) }} <br />
-                        Modified: {{ formatDate(currModified) }}
+                        Last Modified: {{ formatDate(currModified) }}
                     </div>
                 </div>
                 <v-divider></v-divider>
@@ -172,11 +172,11 @@ watch(
 #chipDisplay {
     width: 100%;
     overflow-x: scroll;
-    height: 32px;
+    height: 42px;
 }
 
 #chipDisplay > div {
-    display: flex;
+    display: inline-flex;
     flex-direction: row;
     height: 32px;
     gap: 5px;

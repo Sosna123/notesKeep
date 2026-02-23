@@ -24,7 +24,6 @@ async function getUserNotes(): Promise<number> {
         const json = await data.json();
 
         json.forEach((el: { tags: string }) => {
-            console.log(el.tags);
             el.tags = JSON.parse(el.tags);
         });
 

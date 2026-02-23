@@ -39,10 +39,6 @@ const emit = defineEmits<{
     width: 50px;
 }
 
-.v-overlay {
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
 .v-overlay .v-card {
     margin: auto;
 }
