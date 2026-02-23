@@ -2,10 +2,16 @@
 import { onMounted, ref, watch } from "vue";
 import { apiUri, type Note } from "@/exports.ts";
 import CurrentNote from "@/components/CurrentNote.vue";
+import FilteringNotes from "@/components/FilteringNotes.vue";
 
 const props = defineProps({ updateNotes: Number });
 
 const notes = ref<Note[]>([]);
+const filteredNotes = ref<Note[]>([]);
+const filterRules = ref<{ title: string; tags: string[] }>({
+    title: "",
+    tags: [] as string[],
+});
 let currNote = ref<Note | null>(null);
 
 async function getUserNotes(): Promise<number> {
@@ -40,6 +46,7 @@ async function getUserNotes(): Promise<number> {
             });
         });
 
+        filterNotes();
         return 1;
     } else {
         console.error("Failed to fetch notes");
@@ -74,11 +81,32 @@ function shortCardDesc(text: string): string {
     }
 }
 
+function filterNotes() {
+    let currentFilteringNotes = [...notes.value];
+
+    currentFilteringNotes = currentFilteringNotes.filter((note) => {
+        let currFilter = true;
+
+        if (!note.title!.toLowerCase().includes(filterRules.value.title.toLowerCase()) && filterRules.value.title.trim().length > 0) {
+            currFilter = false;
+        }
+
+        if (filterRules.value.tags.length > 0) {
+            filterRules.value.tags.forEach((tag) => {
+                if (!note.tags.includes(tag)) {
+                    currFilter = false;
+                }
+            });
+        }
+
+        return currFilter;
+    });
+
+    filteredNotes.value = [...currentFilteringNotes];
+}
+
 onMounted(async () => {
-    // wait for refreshed token
-    setTimeout(() => {
-        getUserNotes();
-    }, 50);
+    getUserNotes();
 });
 
 watch(
@@ -87,13 +115,17 @@ watch(
         getUserNotes();
     },
 );
+
+watch(
+    () => filterRules.value,
+    () => {
+        getUserNotes();
+    },
+    { deep: true },
+);
 </script>
 
 <template>
-    <div id="notesContainer">
-        <v-card class="note" v-for="note in notes" @click="currNote = note" :color="note.color ?? 'dark'" :title="note.title ?? '...'" :text="shortCardDesc(note.content ?? '...')"></v-card>
-    </div>
-
     <CurrentNote
         @close="
             (isDeleted: boolean) => {
@@ -103,13 +135,27 @@ watch(
         "
         :note="currNote"
         v-if="currNote != null" />
+
+    <div id="mainContentContainer">
+        <FilteringNotes :notes :filterRules />
+        <div id="notesContainer">
+            <v-card class="note" v-for="note in filteredNotes" @click="currNote = note" :color="note.color ?? 'dark'" :title="note.title ?? '...'" :text="shortCardDesc(note.content ?? '...')"></v-card>
+        </div>
+    </div>
 </template>
 
 <style scoped>
+#mainContentContainer {
+    padding: 0 30px 30px 30px;
+}
+
+#mainContentContainer > div {
+    padding-top: 30px;
+}
+
 #notesContainer {
     display: flex;
     flex-wrap: wrap;
-    padding: 30px;
     gap: 15px;
 }
 
