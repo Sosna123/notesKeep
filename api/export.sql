@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS `notes` (
   `dateOfCreation` varchar(13) DEFAULT NULL,
   `dateOfLastChange` varchar(13) DEFAULT NULL,
   `color` varchar(20) DEFAULT NULL,
+  `tags` text NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 

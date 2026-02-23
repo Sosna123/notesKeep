@@ -22,6 +22,12 @@ async function getUserNotes(): Promise<number> {
 
     if (data.ok) {
         const json = await data.json();
+
+        json.forEach((el: { tags: string }) => {
+            console.log(el.tags);
+            el.tags = JSON.parse(el.tags);
+        });
+
         json.forEach((el: Note) => {
             notes.value.push({
                 id: el.id,
@@ -31,6 +37,7 @@ async function getUserNotes(): Promise<number> {
                 dateOfCreation: Number(el.dateOfCreation),
                 dateOfLastChange: Number(el.dateOfLastChange),
                 color: el.color,
+                tags: el.tags,
             });
         });
 

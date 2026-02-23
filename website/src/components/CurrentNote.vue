@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import YesNoModal from "@/components/reusable/YesNoModal.vue";
 import ColorPicker from "@/components/reusable/ColorPicker.vue";
+import AddTags from "@/components/reusable/AddTags.vue";
 import { apiUri, type Note } from "@/exports";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 const props = defineProps<{
     note: Note;
 }>();
@@ -27,7 +28,16 @@ async function updateNote() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
-        body: JSON.stringify(props.note),
+        body: JSON.stringify({
+            id: props.note.id,
+            user_id: props.note.user_id,
+            title: props.note.title,
+            content: props.note.content,
+            dateOfCreation: props.note.dateOfCreation,
+            dateOfLastChange: props.note.dateOfLastChange,
+            color: props.note.color,
+            tags: JSON.stringify(props.note.tags),
+        }),
     });
 
     if (!data.ok) {
@@ -55,6 +65,14 @@ function close() {
     currModified.value = 0;
     emit("close", false);
 }
+
+watch(
+    () => props.note.tags,
+    () => {
+        updateNote();
+    },
+    { deep: true },
+);
 </script>
 
 <template>
@@ -73,7 +91,12 @@ function close() {
                 <v-divider></v-divider>
             </template>
             <template v-slot:text>
-                <v-textarea v-model="props.note.content" max-rows="18" rows="18" auto-grow @change="updateNote()"></v-textarea>
+                <v-textarea v-model="props.note.content" max-rows="17" rows="17" auto-grow @change="updateNote()"></v-textarea>
+                <div id="chipDisplay">
+                    <div>
+                        <v-chip v-for="tag in note.tags">{{ tag }}</v-chip>
+                    </div>
+                </div>
             </template>
             <template v-slot:actions>
                 <div>
@@ -83,6 +106,7 @@ function close() {
                     <div>
                         <YesNoModal message="Do you want to delete this note?" iconBtn="mdi-trash-can" colorBtn="bg-error" :colorBg="note.color!" @deleteNote="deleteNote()" />
                         <ColorPicker :note="note" />
+                        <AddTags :note="note" />
                     </div>
                 </div>
             </template>
@@ -143,5 +167,18 @@ function close() {
 .v-card-title > div > div:nth-child(2) {
     text-align: right;
     font-size: 75%;
+}
+
+#chipDisplay {
+    width: 100%;
+    overflow-x: scroll;
+    height: 32px;
+}
+
+#chipDisplay > div {
+    display: flex;
+    flex-direction: row;
+    height: 32px;
+    gap: 5px;
 }
 </style>

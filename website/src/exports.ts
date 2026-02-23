@@ -10,6 +10,7 @@ export type Note = {
     dateOfCreation: number | null;
     dateOfLastChange: number | null;
     color: string | null;
+    tags: string[];
 };
 
 export const errorDisplayInfo = ref<{ message: string; show: boolean }>({

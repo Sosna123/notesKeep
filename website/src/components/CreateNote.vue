@@ -14,6 +14,7 @@ let newNote = ref<Note>({
     dateOfCreation: -1,
     dateOfLastChange: -1,
     color: "#070707",
+    tags: [],
 });
 
 async function addNote() {

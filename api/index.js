@@ -438,8 +438,8 @@ app.post(
             note.color = "default";
         }
 
-        const addNoteQuery = "INSERT INTO notes VALUES (NULL, ?, ?, ?, ?, ?, ?)";
-        db.query(addNoteQuery, [user.id, note.title, note.content, currDate, currDate, note.color], (err, results) => {
+        const addNoteQuery = "INSERT INTO notes VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)";
+        db.query(addNoteQuery, [user.id, note.title, note.content, currDate, currDate, note.color, "[]"], (err, results) => {
             if (err) {
                 console.error(err);
                 return res.status(500).send(responses.serverError);
@@ -486,8 +486,8 @@ app.put(
         let currDate = Number(new Date()).toString();
         res.locals.currDate = currDate;
 
-        const modifyNoteQuery = "UPDATE notes SET title = ?, content = ?, dateOfLastChange = ?, color = ? WHERE id = ? AND user_id = ?";
-        db.query(modifyNoteQuery, [note.title, note.content, currDate, note.color, /* where */ note.id, note.user_id], (err, results) => {
+        const modifyNoteQuery = "UPDATE notes SET title = ?, content = ?, dateOfLastChange = ?, color = ?, tags = ? WHERE id = ? AND user_id = ?";
+        db.query(modifyNoteQuery, [note.title, note.content, currDate, note.color, note.tags, /* where */ note.id, note.user_id], (err, results) => {
             if (err) {
                 console.error(err);
                 return res.status(500).send(responses.serverError);
