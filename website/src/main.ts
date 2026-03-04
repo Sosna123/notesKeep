@@ -4,11 +4,13 @@ import App from "./App.vue";
 
 import { createWebHistory, createRouter } from "vue-router";
 
-import Home from "./views/Home.vue";
+import NotesDisplay from "./views/NotesDisplay.vue";
+import Settings from "./views/Settings.vue";
 import Login from "./views/Login.vue";
 
 const routes = [
-    { path: "/", component: Home },
+    { path: "/", name: "home", component: NotesDisplay },
+    { path: "/settings", name: "settings", component: Settings },
     { path: "/login", name: "loginForm", component: Login },
     { path: "/signup", name: "signUpForm", component: Login },
 ];

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import { apiUri, errorDisplayInfo } from "@/exports";
+import Navbar from "@/components/Navbar.vue";
 import ErrorDisplay from "@/components/reusable/ErrorDisplay.vue";
 const router = useRouter();
 let refreshInterval: number | null = null;
@@ -54,6 +55,7 @@ function clearRefreshInterval() {
 
 <template>
     <div class="bg-grey-darken-3" style="min-height: 100vh">
+        <Navbar />
         <router-view @loggedIn="setRefreshInterval()" @logout="clearRefreshInterval()" />
         <ErrorDisplay v-show="errorDisplayInfo.show" />
     </div>
