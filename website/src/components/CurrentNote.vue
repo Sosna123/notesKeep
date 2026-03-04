@@ -7,9 +7,8 @@ import { ref, watch } from "vue";
 const props = defineProps<{
     note: Note;
 }>();
-const emit = defineEmits<{
-    close: [boolean];
-}>();
+
+let currModified = ref<number>(props.note?.dateOfLastChange ?? 0);
 
 function formatDate(timestamp: number | null): string {
     if (timestamp == null) return "Unknown date";
@@ -56,14 +55,10 @@ async function deleteNote() {
     });
 
     if (data.ok) {
-        emit("close", true);
+        return 1;
+    } else {
+        return -1;
     }
-}
-
-let currModified = ref<number>(props.note?.dateOfLastChange ?? 0);
-function close() {
-    currModified.value = 0;
-    emit("close", false);
 }
 
 watch(
@@ -76,62 +71,66 @@ watch(
 </script>
 
 <template>
-    <div id="currNoteContainer">
-        <v-card v-if="props.note != null" :color="props.note.color ?? 'dark'">
-            <template v-slot:title id="titleSlot">
-                <div>
+    <v-dialog activator="parent">
+        <template v-slot:default="{ isActive }">
+            <v-card :color="props.note.color ?? 'dark'">
+                <template v-slot:title id="titleSlot" v-slot:default="{ isActive }">
                     <div>
-                        <v-textarea v-model="props.note.title" rows="1" no-resize @change="updateNote()"></v-textarea>
+                        <div>
+                            <v-textarea v-model="props.note.title" rows="1" no-resize @change="updateNote()"></v-textarea>
+                        </div>
+                        <div>
+                            Created: {{ formatDate(props.note.dateOfCreation) }} <br />
+                            Last Modified: {{ formatDate(currModified) }}
+                        </div>
                     </div>
+                    <v-divider></v-divider>
+                </template>
+                <template v-slot:text>
+                    <v-textarea v-model="props.note.content" max-rows="17" rows="17" auto-grow @change="updateNote()"></v-textarea>
+                    <div id="chipDisplay">
+                        <div>
+                            <v-chip v-for="tag in note.tags">{{ tag }}</v-chip>
+                        </div>
+                    </div>
+                </template>
+                <template v-slot:actions>
                     <div>
-                        Created: {{ formatDate(props.note.dateOfCreation) }} <br />
-                        Last Modified: {{ formatDate(currModified) }}
+                        <div>
+                            <v-btn
+                                @click="
+                                    updateNote();
+                                    isActive.value = false;
+                                "
+                                class="bg-success"
+                                ><v-icon size="x-large" icon="mdi-check"></v-icon
+                            ></v-btn>
+                        </div>
+                        <div>
+                            <YesNoModal
+                                message="Do you want to delete this note?"
+                                iconBtn="mdi-trash-can"
+                                colorBtn="bg-error"
+                                :colorBg="note.color!"
+                                @deleteNote="
+                                    deleteNote();
+                                    isActive.value = false;
+                                " />
+                            <ColorPicker :note="note" />
+                            <AddTags :note="note" />
+                        </div>
                     </div>
-                </div>
-                <v-divider></v-divider>
-            </template>
-            <template v-slot:text>
-                <v-textarea v-model="props.note.content" max-rows="17" rows="17" auto-grow @change="updateNote()"></v-textarea>
-                <div id="chipDisplay">
-                    <div>
-                        <v-chip v-for="tag in note.tags">{{ tag }}</v-chip>
-                    </div>
-                </div>
-            </template>
-            <template v-slot:actions>
-                <div>
-                    <div>
-                        <v-btn @click="close()" class="bg-success"><v-icon size="x-large" icon="mdi-check"></v-icon></v-btn>
-                    </div>
-                    <div>
-                        <YesNoModal message="Do you want to delete this note?" iconBtn="mdi-trash-can" colorBtn="bg-error" :colorBg="note.color!" @deleteNote="deleteNote()" />
-                        <ColorPicker :note="note" />
-                        <AddTags :note="note" />
-                    </div>
-                </div>
-            </template>
-        </v-card>
-    </div>
+                </template>
+            </v-card>
+        </template>
+    </v-dialog>
 </template>
 
 <style scoped>
-#currNoteContainer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 40px;
-}
-
-#currNoteContainer > div.v-card {
+div.v-card {
     width: 60%;
     height: 80%;
+    margin: auto;
 }
 
 .v-card-title > div {
