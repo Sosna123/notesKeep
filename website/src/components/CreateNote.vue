@@ -2,9 +2,6 @@
 import { apiUri, type Note } from "@/exports";
 import { ref } from "vue";
 import ColorPicker from "@/components/reusable/ColorPicker.vue";
-const emit = defineEmits<{
-    close: [boolean];
-}>();
 
 let newNote = ref<Note>({
     id: -1,
@@ -35,62 +32,76 @@ async function addNote() {
         }),
     });
 
-    emit("close", true);
     if (!data.ok) {
         console.error("Failed to add note");
     }
 }
 
 function close() {
-    emit("close", false);
+    newNote.value = {
+        id: -1,
+        user_id: -1,
+        title: "",
+        content: "",
+        dateOfCreation: -1,
+        dateOfLastChange: -1,
+        color: "#070707",
+        tags: [],
+    };
 }
 </script>
 
 <template>
-    <div id="currNoteContainer">
-        <v-card v-if="newNote != null" :color="newNote.color ?? 'dark'">
-            <template v-slot:title id="titleSlot">
-                <div>
-                    <v-textarea v-model="newNote.title" placeholder="Title" rows="1" no-resize></v-textarea>
-                </div>
-                <v-divider></v-divider>
-            </template>
-            <template v-slot:text>
-                <v-textarea v-model="newNote.content" placeholder="Content" max-rows="18" rows="18" auto-grow></v-textarea>
-            </template>
-            <template v-slot:actions>
-                <div>
+    <v-dialog>
+        <template v-slot:activator="{ props: activatorProps }">
+            <v-btn v-bind="activatorProps" class="bg-success" prepend-icon="mdi-plus">Create new note</v-btn>
+        </template>
+        <template v-slot:default="{ isActive }">
+            <v-card v-if="newNote != null" :color="newNote.color ?? 'dark'">
+                <template v-slot:title id="titleSlot">
                     <div>
-                        <v-btn class="bg-success" @click="addNote()"><v-icon size="x-large" icon="mdi-check"></v-icon></v-btn>
-                        <v-btn class="bg-error" @click="close()"><v-icon size="x-large" icon="mdi-close"></v-icon></v-btn>
+                        <v-textarea v-model="newNote.title" placeholder="Title" rows="1" no-resize></v-textarea>
                     </div>
+                    <v-divider></v-divider>
+                </template>
+                <template v-slot:text>
+                    <v-textarea v-model="newNote.content" placeholder="Content" max-rows="18" rows="18" auto-grow></v-textarea>
+                </template>
+                <template v-slot:actions>
                     <div>
-                        <ColorPicker :note="newNote" />
+                        <div>
+                            <v-btn
+                                class="bg-success"
+                                @click="
+                                    addNote();
+                                    isActive.value = false;
+                                "
+                                ><v-icon size="x-large" icon="mdi-check"></v-icon
+                            ></v-btn>
+                            <v-btn
+                                class="bg-error"
+                                @click="
+                                    close();
+                                    isActive.value = false;
+                                "
+                                ><v-icon size="x-large" icon="mdi-close"></v-icon
+                            ></v-btn>
+                        </div>
+                        <div>
+                            <ColorPicker :note="newNote" />
+                        </div>
                     </div>
-                </div>
-            </template>
-        </v-card>
-    </div>
+                </template>
+            </v-card>
+        </template>
+    </v-dialog>
 </template>
 
 <style scoped>
-#currNoteContainer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 40px;
-}
-
-#currNoteContainer > div.v-card {
+div.v-card {
     width: 60%;
     height: 80%;
+    margin: auto;
 }
 
 .v-card-title > div {

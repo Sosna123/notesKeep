@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import NotesDisplay from "@/components/NotesDisplay.vue";
-import CreateNote from "@/components/CreateNote.vue";
 import { useRouter } from "vue-router";
 import { ref } from "vue";
 import { apiUri } from "@/exports";
@@ -9,16 +8,7 @@ const emit = defineEmits<{
     logout: [null];
 }>();
 
-let createNote = ref<boolean>(false);
 let updateNotes = ref<number>(0);
-
-function noteCreated(wasCreated: boolean) {
-    createNote.value = false;
-
-    if (wasCreated == true) {
-        updateNotes.value++;
-    }
-}
 
 async function logout() {
     const data = await fetch(`${apiUri}/logout`, {
@@ -41,16 +31,8 @@ async function logout() {
 </script>
 
 <template>
-    <CreateNote
-        v-if="createNote === true"
-        @close="
-            (wasCreated: boolean) => {
-                noteCreated(wasCreated);
-            }
-        " />
     <div id="controls" class="bg-grey-darken-4">
         <v-btn color="warning" @click="logout()">Log out</v-btn>
-        <v-btn color="success" @click="createNote = true"><v-icon size="x-large" icon="mdi-plus"></v-icon></v-btn>
     </div>
     <NotesDisplay :updateNotes="updateNotes" />
 </template>
