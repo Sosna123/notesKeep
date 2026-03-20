@@ -5,6 +5,9 @@ import { ref } from "vue";
 import YesNoModal from "@/components/reusable/YesNoModal.vue";
 import ManageTagsSettings from "@/components/ManageTagsSettings.vue";
 const router = useRouter();
+const emit = defineEmits<{
+    logout: [null];
+}>();
 
 const deletePass = ref<string>("");
 const deleteAccRef = ref<any>(false);
@@ -23,6 +26,7 @@ async function logout() {
     if (await data.ok) {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
+        emit("logout", null);
         router.push("/login");
     }
 }
