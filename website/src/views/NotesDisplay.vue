@@ -127,30 +127,21 @@ watch(
 </script>
 
 <template>
-    <div id="mainContentContainer">
-        <CreateNote />
-        <FilteringNotes :notes :filterRules />
-        <div id="notesContainer">
-            <v-card class="note" v-for="note in filteredNotes" @click="currNote = note" :color="note.color ?? 'dark'" :title="note.title ?? '...'" :text="shortCardDesc(note.content ?? '...')">
-                <CurrentNote :note />
-            </v-card>
-        </div>
+    <CreateNote />
+    <FilteringNotes :notes :filterRules />
+    <div id="notesContainer">
+        <v-card class="note" v-for="note in filteredNotes" @click="currNote = note" :color="note.color ?? 'dark'" :title="note.title ?? '...'" :text="shortCardDesc(note.content ?? '...')">
+            <CurrentNote :note />
+        </v-card>
     </div>
 </template>
 
 <style scoped>
-#mainContentContainer {
-    padding: 0 30px 30px 30px;
-}
-
-#mainContentContainer > div {
-    padding-top: 30px;
-}
-
 #notesContainer {
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
+    padding-top: 30px;
 }
 
 #notesContainer > .note {

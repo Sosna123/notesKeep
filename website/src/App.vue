@@ -26,10 +26,19 @@ async function refreshToken() {
     }
 }
 
-if (((!localStorage.getItem("accessToken") || !localStorage.getItem("refreshToken")) && router.currentRoute.value.name == "loginForm") || router.currentRoute.value.name == "signUpForm") {
-    router.push("/login");
-}
-if (localStorage.getItem("accessToken") || localStorage.getItem("refreshToken")) {
+router.beforeEach((to, _from, next) => {
+    if (!localStorage.getItem("accessToken") && !localStorage.getItem("refreshToken")) {
+        if (to.name != "loginForm" && to.name != "signUpForm") {
+            next("/login");
+        } else {
+            next();
+        }
+    } else {
+        next();
+    }
+});
+
+if (localStorage.getItem("refreshToken")) {
     refreshToken();
     setRefreshInterval();
 }
@@ -56,9 +65,15 @@ function clearRefreshInterval() {
 <template>
     <div class="bg-grey-darken-3" style="min-height: 100vh">
         <Navbar />
-        <router-view @loggedIn="setRefreshInterval()" @logout="clearRefreshInterval()" />
-        <ErrorDisplay v-show="errorDisplayInfo.show" />
+        <div id="mainContentContainer">
+            <router-view @loggedIn="setRefreshInterval()" @logout="clearRefreshInterval()" />
+            <ErrorDisplay v-show="errorDisplayInfo.show" />
+        </div>
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+#mainContentContainer {
+    padding: 0 30px 30px 30px;
+}
+</style>

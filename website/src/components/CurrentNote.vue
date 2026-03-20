@@ -112,7 +112,7 @@ watch(
                                 iconBtn="mdi-trash-can"
                                 colorBtn="bg-error"
                                 :colorBg="note.color!"
-                                @deleteNote="
+                                @clickedYes="
                                     deleteNote();
                                     isActive.value = false;
                                 " />

@@ -1,19 +1,20 @@
 <script setup lang="ts">
 const emit = defineEmits<{
-    deleteNote: [null];
+    clickedYes: [null];
 }>();
 const props = defineProps<{
     message: string;
     iconBtn: string;
     colorBtn: string;
-    colorBg: string;
+    colorBg?: string;
+    textBtn?: string;
 }>();
 </script>
 
 <template>
     <v-dialog>
         <template v-slot:activator="{ props: activatorProps }">
-            <v-btn v-bind="activatorProps" :class="props.colorBtn"><v-icon :icon="props.iconBtn" size="x-large"></v-icon></v-btn>
+            <v-btn v-bind="activatorProps" :class="props.colorBtn"><v-icon :icon="props.iconBtn" size="x-large"></v-icon>{{ props.textBtn }}</v-btn>
         </template>
         <template v-slot:default="{ isActive }">
             <v-card id="yesNoModal" :color="props.colorBg ?? 'dark'">
@@ -23,7 +24,7 @@ const props = defineProps<{
                         class="bg-success"
                         @click="
                             isActive.value = false;
-                            emit('deleteNote', null);
+                            emit('clickedYes', null);
                         "
                         ><v-icon icon="mdi-check" size="x-large"></v-icon
                     ></v-btn>

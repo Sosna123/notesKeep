@@ -294,20 +294,34 @@ app.post(
     },
 );
 
-app.delete("/user/delete", checkAccessToken, (req, res, next) => {
-    const user = res.locals.user;
+app.delete(
+    "/user/delete",
+    checkAccessToken,
+    async (req, res, next) => {
+        const user = res.locals.user;
+        const password = req.body.password;
 
-    const deleteUserQuery = "DELETE FROM users WHERE id = ?";
-    db.query(deleteUserQuery, [user.id], (err, results) => {
-        if (err) {
-            return res.status(500).send(responses.serverError);
-        } else if ((results.affectedRows = 1)) {
-            return res.status(200).send("Successfully deleted the account");
+        if (password == null || (await checkHashedPassword(password, user.password)) != 1) {
+            res.status(403).send(responses.wrongCredentials);
         } else {
-            return res.status(500).send(responses.serverError);
+            next();
         }
-    });
-});
+    },
+    (req, res) => {
+        const user = res.locals.user;
+
+        const deleteUserQuery = "DELETE FROM users WHERE id = ?";
+        db.query(deleteUserQuery, [user.id], (err, results) => {
+            if (err) {
+                return res.status(500).send(responses.serverError);
+            } else if ((results.affectedRows = 1)) {
+                return res.status(200).send("Successfully deleted the account");
+            } else {
+                return res.status(500).send(responses.serverError);
+            }
+        });
+    },
+);
 
 // tags
 app.get("/user/tags/", checkAccessToken, (req, res) => {
