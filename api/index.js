@@ -453,7 +453,7 @@ app.post(
         }
 
         const addNoteQuery = "INSERT INTO notes VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)";
-        db.query(addNoteQuery, [user.id, note.title, note.content, currDate, currDate, note.color, "[]"], (err, results) => {
+        db.query(addNoteQuery, [user.id, note.title, note.content, currDate, currDate, note.color, note.tags], (err, results) => {
             if (err) {
                 console.error(err);
                 return res.status(500).send(responses.serverError);

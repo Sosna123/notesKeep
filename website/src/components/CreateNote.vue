@@ -34,6 +34,7 @@ async function addNote() {
             title: newNote.value.title,
             content: newNote.value.content,
             color: newNote.value.color,
+            tags: JSON.stringify(newNote.value.tags),
         }),
     });
 
