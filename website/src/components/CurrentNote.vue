@@ -7,6 +7,9 @@ import { ref, watch } from "vue";
 const props = defineProps<{
     note: Note;
 }>();
+const emit = defineEmits<{
+    noteDeleted: [null];
+}>();
 
 let currModified = ref<number>(props.note?.dateOfLastChange ?? 0);
 
@@ -114,6 +117,7 @@ watch(
                                 :colorBg="note.color!"
                                 @clickedYes="
                                     deleteNote();
+                                    emit('noteDeleted', null);
                                     isActive.value = false;
                                 " />
                             <ColorPicker :note="note" />

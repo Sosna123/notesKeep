@@ -2,6 +2,11 @@
 import { apiUri, type Note } from "@/exports";
 import { ref } from "vue";
 import ColorPicker from "@/components/reusable/ColorPicker.vue";
+import AddTags from "@/components/reusable/AddTags.vue";
+
+const emit = defineEmits<{
+    addedNote: [null];
+}>();
 
 let newNote = ref<Note>({
     id: -1,
@@ -74,6 +79,7 @@ function close() {
                                 class="bg-success"
                                 @click="
                                     addNote();
+                                    emit('addedNote', null);
                                     isActive.value = false;
                                 "
                                 ><v-icon size="x-large" icon="mdi-check"></v-icon
@@ -89,6 +95,7 @@ function close() {
                         </div>
                         <div>
                             <ColorPicker :note="newNote" />
+                            <AddTags :note="newNote" />
                         </div>
                     </div>
                 </template>

@@ -5,8 +5,6 @@ import CurrentNote from "@/components/CurrentNote.vue";
 import CreateNote from "@/components/CreateNote.vue";
 import FilteringNotes from "@/components/FilteringNotes.vue";
 
-const props = defineProps({ updateNotes: Number });
-
 const notes = ref<Note[]>([]);
 const filteredNotes = ref<Note[]>([]);
 const filterRules = ref<{ title: string; tags: string[] }>({
@@ -17,7 +15,6 @@ let currNote = ref<Note | null>(null);
 
 async function getUserNotes(): Promise<number> {
     notes.value = [];
-    notes.value.length = 0;
 
     const data = await fetch(`${apiUri}/user/notes`, {
         method: "GET",
@@ -111,13 +108,6 @@ onMounted(async () => {
 });
 
 watch(
-    () => props.updateNotes,
-    () => {
-        getUserNotes();
-    },
-);
-
-watch(
     () => filterRules.value,
     () => {
         getUserNotes();
@@ -127,11 +117,11 @@ watch(
 </script>
 
 <template>
-    <CreateNote />
+    <CreateNote @addedNote="getUserNotes()" />
     <FilteringNotes :notes :filterRules />
     <div id="notesContainer">
         <v-card class="note" v-for="note in filteredNotes" @click="currNote = note" :color="note.color ?? 'dark'" :title="note.title ?? '...'" :text="shortCardDesc(note.content ?? '...')">
-            <CurrentNote :note />
+            <CurrentNote :note @noteDeleted="getUserNotes()" />
         </v-card>
     </div>
 </template>
