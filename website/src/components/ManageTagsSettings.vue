@@ -81,7 +81,7 @@ onMounted(() => {
                     <ul>
                         <li v-for="tag in tagList" v-show="tagList.length > 0" :key="tag">
                             {{ tag }}
-                            <YesNoModal :message="`Are you sure you want to delete ${tag}`" iconBtn="mdi-minus-circle-outline" colorBtn="bg-error" @clickedYes="deleteTag(tag)" />
+                            <YesNoModal :message="`Are you sure you want to delete ${tag}. After deletion, this tag will be removed from all notes`" iconBtn="mdi-minus-circle-outline" colorBtn="bg-error" @clickedYes="deleteTag(tag)" />
                         </li>
                     </ul>
                 </div>

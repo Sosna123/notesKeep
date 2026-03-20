@@ -3,6 +3,7 @@ import { apiUri, type Note } from "@/exports";
 import { ref } from "vue";
 import ColorPicker from "@/components/reusable/ColorPicker.vue";
 import AddTags from "@/components/reusable/AddTags.vue";
+import ImportNoteFromFile from "@/components/ImportNoteFromFile.vue";
 
 const emit = defineEmits<{
     addedNote: [null];
@@ -97,6 +98,7 @@ function close() {
                         <div>
                             <ColorPicker :note="newNote" />
                             <AddTags :note="newNote" />
+                            <ImportNoteFromFile :note="newNote" />
                         </div>
                     </div>
                 </template>
