@@ -73,6 +73,11 @@ function close() {
                 </template>
                 <template v-slot:text>
                     <v-textarea v-model="newNote.content" placeholder="Content" max-rows="18" rows="18" auto-grow></v-textarea>
+                    <div id="chipDisplay">
+                        <div>
+                            <v-chip v-for="tag in newNote.tags">{{ tag }}</v-chip>
+                        </div>
+                    </div>
                 </template>
                 <template v-slot:actions>
                     <div>
@@ -137,5 +142,18 @@ div.v-card {
     padding-left: 15px;
     margin: 0;
     padding: 0;
+}
+
+#chipDisplay {
+    width: 100%;
+    overflow-x: scroll;
+    height: 42px;
+}
+
+#chipDisplay > div {
+    display: inline-flex;
+    flex-direction: row;
+    height: 32px;
+    gap: 5px;
 }
 </style>
