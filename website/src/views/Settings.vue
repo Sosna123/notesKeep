@@ -3,6 +3,7 @@ import { useRouter } from "vue-router";
 import { apiUri } from "@/exports";
 import { ref } from "vue";
 import YesNoModal from "@/components/reusable/YesNoModal.vue";
+import ManageTagsSettings from "@/components/ManageTagsSettings.vue";
 const router = useRouter();
 
 const deletePass = ref<string>("");
@@ -47,6 +48,9 @@ async function deleteAccount() {
 
 <template>
     <div id="settingsButtons">
+        <!-- tags management -->
+        <ManageTagsSettings />
+
         <!-- logout -->
         <YesNoModal message="Are you sure you want to log out?" iconBtn="mdi-logout" colorBtn="bg-warning" textBtn="logout" @clickedYes="logout()" />
 

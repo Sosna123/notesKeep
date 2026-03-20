@@ -422,6 +422,11 @@ app.delete(
             }
         });
     },
+    // TODO
+    // SELECT * FROM notes WHERE user_id = user_id AND tags LIKE "%deletedTag%"
+    // for loop all notes
+    // delete the tag from the notes tag
+    // UPDATE notes SET tags = newTags WHERE id = id    for each note that had that tag???
 );
 
 //
