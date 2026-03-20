@@ -340,7 +340,6 @@ app.post(
     "/user/tags/create",
     checkAccessToken,
     (req, res, next) => {
-        console.log(req.body);
         if (req.body.tag == null || req.body.tag == "") {
             return res.status(403).send(responses.notEnoughInfo);
         } else {
@@ -384,7 +383,6 @@ app.delete(
     "/user/tags/delete",
     checkAccessToken,
     (req, res, next) => {
-        console.log(req.body);
         if (req.body.tag == null || req.body.tag == "") {
             return res.status(403).send(responses.notEnoughInfo);
         } else {
@@ -412,21 +410,46 @@ app.delete(
         }
     },
     (req, res, next) => {
-        const getTagsQuery = "UPDATE users SET tags = ? WHERE id = ?";
-        db.query(getTagsQuery, [JSON.stringify(res.locals.tags), res.locals.user.id], (err, results) => {
+        const newTagsQuery = "UPDATE users SET tags = ? WHERE id = ?";
+        db.query(newTagsQuery, [JSON.stringify(res.locals.tags), res.locals.user.id], (err, results) => {
             if (err) {
                 console.error(err);
                 return res.status(500).send(responses.serverError);
             } else {
-                res.status(200).json(res.locals.tags);
+                next();
             }
         });
     },
-    // TODO
-    // SELECT * FROM notes WHERE user_id = user_id AND tags LIKE "%deletedTag%"
-    // for loop all notes
-    // delete the tag from the notes tag
-    // UPDATE notes SET tags = newTags WHERE id = id    for each note that had that tag???
+    (req, res, next) => {
+        const getTagsQuery = `SELECT * FROM notes WHERE user_id = user_id AND tags LIKE '%${req.body.tag}%'`;
+        db.query(getTagsQuery, [], (err, results) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send(responses.serverError);
+            } else {
+                res.locals.notesToUpdate = results;
+                next();
+            }
+        });
+    },
+    (req, res, next) => {
+        res.locals.notesToUpdate.forEach((note) => {
+            note.tags = JSON.parse(note.tags);
+            note.tags.splice(note.tags.indexOf(req.body.tag), 1);
+            note.tags = JSON.stringify(note.tags);
+
+            const updateTagsQuery = "UPDATE notes SET tags = ? WHERE id = ?";
+
+            db.query(updateTagsQuery, [note.tags, note.id], (err, results) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).send(responses.serverError);
+                }
+            });
+        });
+
+        res.status(200).json(res.locals.tags);
+    },
 );
 
 //
@@ -438,8 +461,6 @@ app.post(
     (req, res, next) => {
         const note = req.body;
         const user = res.locals.user;
-
-        console.log(req.body);
 
         if (note.title == "" || note.content == "") {
             return res.status(403).send(responses.notEnoughInfo);
