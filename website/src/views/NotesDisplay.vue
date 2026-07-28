@@ -13,7 +13,7 @@ const filterRules = ref<{ title: string; tags: string[] }>({
 });
 let currNote = ref<Note | null>(null);
 
-async function getUserNotes(): Promise<number> {
+async function getUserNotes(retryLimit: number = 0): Promise<number> {
     notes.value = [];
 
     const data = await fetch(`${apiUri}/user/notes`, {
@@ -47,13 +47,21 @@ async function getUserNotes(): Promise<number> {
         filterNotes();
         return 1;
     } else {
-        console.error("Failed to fetch notes");
-        return -1;
+        if (localStorage.getItem("refreshToken") && retryLimit <= 3) {
+            console.log("Failed to fetch notes, retrying...");
+            setTimeout(() => {
+                getUserNotes(retryLimit + 1);
+            }, 10);
+            return 1;
+        } else {
+            console.error("Failed to fetch notes");
+            return -1;
+        }
     }
 }
 
 function shortCardDesc(text: string): string {
-    const maxLength: number = 800;
+    const maxLength: number = 500;
     let length: number = 0;
     const textArr: string[] = text.split(" ");
     let currTextArr: string[] = [];
