@@ -135,16 +135,33 @@ watch(
 </template>
 
 <style scoped>
-#notesContainer {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    padding-top: 30px;
+@media screen and (min-width: 800px) {
+    #notesContainer {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        padding-top: 30px;
+    }
+
+    #notesContainer > .note {
+        min-width: 10%;
+        max-width: 20%;
+        cursor: pointer;
+    }
 }
 
-#notesContainer > .note {
-    min-width: 10%;
-    max-width: 20%;
-    cursor: pointer;
+@media screen and (max-width: 799px) {
+    #notesContainer {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        padding-top: 30px;
+        width: 100%;
+    }
+
+    #notesContainer > .note {
+        width: 100%;
+        cursor: pointer;
+    }
 }
 </style>
