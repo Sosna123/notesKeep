@@ -130,9 +130,16 @@ watch(
     </v-dialog>
 </template>
 
+<!-- this style is not scoped, to catch the element that is created by vuetify and isn't included in scope -->
+<style>
+.v-dialog > .v-overlay__content {
+    max-width: 60% !important;
+}
+</style>
+
 <style scoped>
 div.v-card {
-    width: 60%;
+    width: 100%;
     height: 80%;
     margin: auto;
 }
@@ -174,7 +181,8 @@ div.v-card {
 
 #chipDisplay {
     width: 100%;
-    overflow-x: scroll;
+    overflow-x: auto;
+    overflow-y: hidden;
     height: 42px;
 }
 
